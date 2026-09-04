@@ -24,9 +24,7 @@ export default function ActivitiesPage() {
 
   const [search, setSearch] = React.useState("");
   const [selectedSkills, setSelectedSkills] = React.useState<SkillCategory[]>([]);
-  const [selectedAge, setSelectedAge] = React.useState<{ min: number; max: number } | null>(
-    childAge ? { min: childAge, max: childAge } : null
-  );
+  const [selectedAge, setSelectedAge] = React.useState<{ min: number; max: number } | null>(null);
   const [selectedDuration, setSelectedDuration] = React.useState<number | null>(null);
   const [selectedDifficulty, setSelectedDifficulty] = React.useState<ActivityDifficulty | null>(null);
   const [preference, setPreference] = React.useState<"indoor" | "outdoor" | "both" | null>(null);
@@ -54,13 +52,13 @@ export default function ActivitiesPage() {
   const clearFilters = () => {
     setSearch("");
     setSelectedSkills([]);
-    setSelectedAge(childAge !== null ? { min: childAge, max: childAge } : null);
+    setSelectedAge(null);
     setSelectedDuration(null);
     setSelectedDifficulty(null);
     setPreference(null);
   };
 
-  const hasFilters = selectedSkills.length > 0 || (childAge === null && selectedAge) || selectedDuration || selectedDifficulty || preference;
+  const hasFilters = selectedSkills.length > 0 || selectedAge || selectedDuration || selectedDifficulty || preference;
 
   return (
     <DashboardLayout>
@@ -71,7 +69,7 @@ export default function ActivitiesPage() {
           </h1>
           <p className="mt-1 text-sm text-neutral-500">
             {selectedChild
-              ? `Activities matched for ${childAge === 0 ? "under 1 year" : `${childAge} years`}`
+              ? `Activities matched for ${childAge === 0 ? "under 1 year" : `${childAge} years`} — adjust age filter to see all`
               : `Discover ${ALL_ACTIVITIES.length}+ activities for every age and skill`}
           </p>
         </div>
@@ -114,6 +112,13 @@ export default function ActivitiesPage() {
               <div>
                 <label className="mb-2 block text-xs font-medium text-neutral-500 uppercase tracking-wide">Age Range</label>
                 <div className="flex flex-wrap gap-2">
+                  <Badge
+                    variant={selectedAge === null ? "default" : "outline"}
+                    className={cn("cursor-pointer transition-colors", selectedAge === null && "bg-neutral-900 text-white")}
+                    onClick={() => setSelectedAge(null)}
+                  >
+                    All ages
+                  </Badge>
                   {AGE_RANGES.map((range) => (
                     <Badge
                       key={range.label}

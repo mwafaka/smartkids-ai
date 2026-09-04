@@ -8,7 +8,7 @@ import { ActivityCard } from "@/components/features/activity-card";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { useAppStore } from "@/stores/app-store";
 import { calculateAge } from "@/lib/utils";
-import { getActivitiesForAge } from "@/data/activities";
+import { getActivitiesForAge, ALL_ACTIVITIES } from "@/data/activities";
 import { SKILL_LABELS } from "@/config/constants";
 import Link from "next/link";
 import type { SkillCategory } from "@/types";
@@ -17,7 +17,15 @@ export default function HomePage() {
   const { selectedChild, completedActivities } = useAppStore();
   const age = selectedChild ? calculateAge(selectedChild.dateOfBirth) : null;
 
-  const ageActivities = age !== null ? getActivitiesForAge(age) : [];
+  const exactAgeActivities = age !== null ? getActivitiesForAge(age) : [];
+  const nearbyActivities = age !== null
+    ? ALL_ACTIVITIES.filter((a) => a.ageMin <= age + 2 && a.ageMax >= Math.max(0, age - 2))
+    : [];
+  const ageActivities = exactAgeActivities.length > 0
+    ? exactAgeActivities
+    : nearbyActivities.length > 0
+      ? nearbyActivities
+      : ALL_ACTIVITIES.slice(0, 6);
 
   const todayActivities = ageActivities.slice(0, 3);
   const recommendedActivities = ageActivities.slice(3, 6);
